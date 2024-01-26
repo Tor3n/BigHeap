@@ -211,6 +211,7 @@ class ClosedLinkedList<Node> extends LinkedList<Node>{
         this.isOpen=isOpen;
     }
 
+
     /*@Override
     public boolean add(Node t) {
         boolean res = super.add(t);
