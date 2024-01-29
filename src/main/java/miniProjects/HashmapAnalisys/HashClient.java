@@ -1,4 +1,4 @@
-package HashmapAnalisys;
+package miniProjects.HashmapAnalisys;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -17,7 +17,6 @@ import javax.swing.event.TreeSelectionListener;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class HashClient extends JFrame implements ActionListener, TreeSelectionListener  {
 

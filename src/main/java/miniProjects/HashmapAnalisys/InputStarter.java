@@ -1,4 +1,4 @@
-package HashmapAnalisys;
+package miniProjects.HashmapAnalisys;
 
 import java.util.HashMap;
 

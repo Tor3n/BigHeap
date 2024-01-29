@@ -4,6 +4,7 @@ import java.util.*;
 
 public class Djikstra {
     ClosedArrayList<ClosedLinkedList<Node>> expStack;
+    //TODO add impl with PQ
     PriorityQueue<ClosedLinkedList<Node>> pq;
 
     public static void main(String[] args) {

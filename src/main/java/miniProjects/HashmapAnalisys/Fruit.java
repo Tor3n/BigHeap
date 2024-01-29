@@ -1,4 +1,4 @@
-package HashmapAnalisys;
+package miniProjects.HashmapAnalisys;
 
 class Fruit{
     private String name;

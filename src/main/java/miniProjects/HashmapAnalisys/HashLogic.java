@@ -1,10 +1,9 @@
-package HashmapAnalisys;
+package miniProjects.HashmapAnalisys;
 
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.lang.reflect.*;
 import java.util.Map;
 import java.util.Set;
