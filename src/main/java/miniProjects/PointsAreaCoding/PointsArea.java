@@ -1,5 +1,7 @@
 package miniProjects.PointsAreaCoding;
 
+import miniProjects.Point;
+
 import java.util.*;
 
 public class PointsArea {

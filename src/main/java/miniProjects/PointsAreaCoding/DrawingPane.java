@@ -18,7 +18,7 @@ class InfoPanel extends JPanel{
         add(coordinateLabel);
     }
 
-    public void showCoordinates(miniProjects.PointsAreaCoding.Point point){
+    public void showCoordinates(miniProjects.Point point){
         if (point != null){
             coordinateLabel.setText("x: "+point.x+", y: "+point.y);
         }
@@ -42,7 +42,7 @@ public class DrawingPane extends JFrame{
 
         PointsArea pA = new PointsArea();
 
-        for(miniProjects.PointsAreaCoding.Point p: pA.points){
+        for(miniProjects.Point p: pA.points){
             canv.addPoint(p);
         }
 
@@ -69,11 +69,11 @@ public class DrawingPane extends JFrame{
 }
 
 class DrawingCanvas extends JPanel{
-    private List<miniProjects.PointsAreaCoding.Point> points;
+    private List<miniProjects.Point> points;
     private List<miniProjects.PointsAreaCoding.Rectangle> rects;
     private List<miniProjects.PointsAreaCoding.Rectangle> emptRects;
     private InfoPanel infoPanel;
-    private miniProjects.PointsAreaCoding.Point highlightedPoint;
+    private miniProjects.Point highlightedPoint;
     private final int GLOBALSENS = 10;
 
     public DrawingCanvas(InfoPanel infopanel){
@@ -108,7 +108,7 @@ class DrawingCanvas extends JPanel{
         repaint();
     }
 
-    public void addPoint(miniProjects.PointsAreaCoding.Point p){
+    public void addPoint(miniProjects.Point p){
         points.add(p);
         repaint();
     }
@@ -144,7 +144,7 @@ class DrawingCanvas extends JPanel{
                     new int[]{r.first.y,r.second.y,r.second.y,r.first.y},4);
         }
 
-        for(miniProjects.PointsAreaCoding.Point point: points){
+        for(miniProjects.Point point: points){
             g.setColor(Color.blue);
             g.fillOval(point.x-5,point.y-5, 6,6);
         }
@@ -158,7 +158,7 @@ class DrawingCanvas extends JPanel{
 
     private void checkPointClicked(java.awt.Point clickPoint){
         System.out.println("coord x:"+clickPoint.x+", y: "+clickPoint.y);
-        for(miniProjects.PointsAreaCoding.Point point:points){
+        for(miniProjects.Point point:points){
             //check if the click is close to any existing points
             int cPx=clickPoint.x;
             int cPy=clickPoint.y;
@@ -177,7 +177,7 @@ class DrawingCanvas extends JPanel{
     }
 
     private void checkPointProximity(java.awt.Point mousePoint){
-        for(miniProjects.PointsAreaCoding.Point point:points){
+        for(miniProjects.Point point:points){
             int cPx=mousePoint.x;
             int cPy=mousePoint.y;
             int px=point.x;

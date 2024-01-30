@@ -1,5 +1,7 @@
 package miniProjects.PointsAreaCoding;
 
+import miniProjects.Point;
+
 class Rectangle{
     Point first;
     Point second;
