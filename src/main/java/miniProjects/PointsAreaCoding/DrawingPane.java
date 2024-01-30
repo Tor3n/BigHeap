@@ -25,6 +25,7 @@ class InfoPanel extends JPanel{
     }
 }
 
+
 public class DrawingPane extends JFrame{
 
     public DrawingPane(){
