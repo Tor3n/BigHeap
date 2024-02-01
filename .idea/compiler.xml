@@ -2,9 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <excludeFromCompile>
-      <file url="file://$PROJECT_DIR$/src/main/java/Classess/ClassA.java" />
       <file url="file://$PROJECT_DIR$/src/main/java/Interface/AnimImpl.java" />
-      <file url="file://$PROJECT_DIR$/src/main/java/Classess/ClassB.java" />
     </excludeFromCompile>
     <annotationProcessing>
       <profile name="Maven default annotation processors profile" enabled="true">
