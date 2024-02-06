@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public abstract class AbstractInfoPanel extends JPanel {
-    private JLabel coordinateLabel;
+    protected JLabel coordinateLabel;
 
     public AbstractInfoPanel() {
         coordinateLabel = new JLabel();

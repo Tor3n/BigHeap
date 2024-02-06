@@ -1,7 +1,7 @@
 package SpeedComparison;
 
 import miniProjects.AbstractDrawingCanva;
-import miniProjects.AbstractDrawingPanel;
+import miniProjects.AbstractDrawingFrame;
 import miniProjects.AbstractInfoPanel;
 import miniProjects.Point;
 
@@ -101,7 +101,7 @@ public class SpeedCompVisu  {
                 NewIpanel ip = new NewIpanel();
                 DrawingCanva2 dc2 = new DrawingCanva2(ip, ll, adq);
                 //JFrame
-                AbstractDrawingPanel p = new AbstractDrawingPanel(ip, dc2) {
+                AbstractDrawingFrame p = new AbstractDrawingFrame(ip, dc2) {
 
                     @Override
                     public void pointsSetter() {
