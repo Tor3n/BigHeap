@@ -12,4 +12,6 @@ public class minusminus {
 
         System.out.println(Arrays.toString(a));
     }
+
+
 }
