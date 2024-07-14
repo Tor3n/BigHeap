@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BigHeap.iml" filepath="$PROJECT_DIR$/BigHeap.iml" />
-      <module fileurl="file://$PROJECT_DIR$/first/first.iml" filepath="$PROJECT_DIR$/first/first.iml" />
     </modules>
   </component>
 </project>

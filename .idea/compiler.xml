@@ -2,7 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <excludeFromCompile>
-      <file url="file://$PROJECT_DIR$/src/main/java/Interface/AnimImpl.java" />
+      <file url="file://$PROJECT_DIR$/src/main/java/aHeap/Interface/AnimImpl.java" />
     </excludeFromCompile>
     <annotationProcessing>
       <profile name="Maven default annotation processors profile" enabled="true">
@@ -12,8 +12,8 @@
         <module name="BigHeap" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="BigHeap" target="10" />
+    <bytecodeTargetLevel target="11">
+      <module name="BigHeap" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
