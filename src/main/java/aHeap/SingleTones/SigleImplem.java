@@ -1,6 +1,7 @@
-package SingleTones;
+package aHeap.SingleTones;
 
 public class SigleImplem {
+    SingleTone ss = SingleTone.getInstance();
 
 /*
 
@@ -20,4 +21,11 @@ public class SigleImplem {
         System.out.println(ss3.hashCode());
         System.out.println(ss5.hashCode());
     }
+
+    public void hohoh(){
+        SingleTone ss = SingleTone.getInstance();
+    }
+
+
+
 }

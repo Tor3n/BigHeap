@@ -1,4 +1,4 @@
-package SingleTones;
+package aHeap.SingleTones;
 
 public class SingleTone {
 
@@ -11,9 +11,6 @@ public class SingleTone {
 
     private static class SingleHelper{
         private static final SingleTone INSTANCE = new SingleTone();
-        public void keke(){
-            int c = h+1;
-        }
     }
 
     private SingleTone(){

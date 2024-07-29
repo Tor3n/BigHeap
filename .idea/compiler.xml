@@ -12,8 +12,8 @@
         <module name="BigHeap" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="11">
-      <module name="BigHeap" target="11" />
+    <bytecodeTargetLevel target="15">
+      <module name="BigHeap" target="15" />
     </bytecodeTargetLevel>
   </component>
 </project>

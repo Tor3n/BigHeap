@@ -1,4 +1,4 @@
-package inher;
+package aHeap.inher;
 
 public class Car {
     private int hp;
@@ -11,6 +11,10 @@ public class Car {
       color=777;
       weight=1000;
       brand="lada";
+    }
+
+    public final void isFinalOv(){
+
     }
 
     public Car(int hp,int color,int weight, String brand){

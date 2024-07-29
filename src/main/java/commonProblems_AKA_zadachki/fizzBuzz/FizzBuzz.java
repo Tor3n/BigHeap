@@ -1,4 +1,4 @@
-package commonProblems.fizzBuzz;
+package commonProblems_AKA_zadachki.fizzBuzz;
 
 public class FizzBuzz {
     public static void main(String[] args){

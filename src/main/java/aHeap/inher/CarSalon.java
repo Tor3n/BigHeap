@@ -1,4 +1,6 @@
-package inher;
+package aHeap.inher;
+
+import aHeap.inher.Car;
 
 public class CarSalon {
     public static void main(String[] args){

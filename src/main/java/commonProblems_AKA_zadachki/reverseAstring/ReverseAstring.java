@@ -1,4 +1,4 @@
-package commonProblems.reverseAstring;
+package commonProblems_AKA_zadachki.reverseAstring;
 
 public class ReverseAstring {
     public static void main(String[] args) {
