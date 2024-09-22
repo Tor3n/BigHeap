@@ -1,0 +1,46 @@
+@startuml
+'https://plantuml.com/object-diagram
+
+package mainZeppJVMprocess{
+   object Thread_main{
+   trace:
+        *jetty.
+        *ZeppelinServer.main
+   }
+   object Thread_jettyThreads...{
+   }
+   object Thread_RMI_threads...
+   object Thread6{
+    trace:
+        *java.net.ServerSocket
+        *org.apache.thrift
+        *RemoteInterpreterEventServer
+
+   }
+
+   package immediateThread_S123{
+       diamond zepp_start
+       diamond joinToMainThread
+       object S3NotebookRepo
+       object paragraph_S1{
+            cloneParagraphForGitStorage()
+       }
+       object notebookRepoSync
+       object vFSNotebookRepo
+       object note
+
+
+
+       zepp_start --> notebookRepoSync: server start
+       notebookRepoSync --> note
+       note --> S3NotebookRepo
+       S3NotebookRepo --> paragraph_S1 : initial load paragraphs
+       paragraph_S1 -> notebookRepoSync
+       Paragraph -|>paragraph_S1
+       notebookRepoSync ---> vFSNotebookRepo
+       vFSNotebookRepo --> joinToMainThread : join to main thread
+   }
+}
+
+
+@enduml

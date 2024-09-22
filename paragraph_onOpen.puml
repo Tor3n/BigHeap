@@ -1,0 +1,133 @@
+@startuml
+'https://plantuml.com/object-diagram
+
+package mainZeppJVMprocess{
+   object Thread_main{
+   trace:
+        *jetty.
+        *ZeppelinServer
+   }
+   object Thread_jettyThreads...{
+   }
+   object Thread_RMI_threads...
+   object Thread6{
+    trace:
+        *java.net.ServerSocket
+        *org.apache.thrift
+        *RemoteInterpreterEventServer
+
+   }
+   object ServerConnector{
+       trace:
+           *sun.nio.ServerSocketChannel
+           *jetty.server.*
+
+   }
+
+
+
+   package qtp_S123{
+
+
+       object notebookServer{
+            onMessage()
+            |switch:
+                |-->listNotes()
+                |-->runParagraph()
+                *|-->getNote()
+                |-->etc...
+       }
+       object notebook {
+            processNote()
+       }
+       object noteManager{
+             loadAndProcessNote()
+       }
+       object noteBookRepoSync{
+            getFromGitRepo()
+       }
+       object vFSNotebookRepo{
+            get(){ noteFileFromLocalSystem -> json-> NoteFromJson }
+
+       }
+
+
+       object note{
+            CopyOnWriteArrayList<Paragraph>
+
+            postProcessParagraphs()
+       }
+       diamond ifReload
+
+
+
+
+       object paragraph1{
+            generateID()
+            constructor paragraph1->JobWithProgressPoller-> Job -> paragraph
+       }
+
+       object paragraph2{
+            generateID()
+            constructor paragraph1->JobWithProgressPoller-> Job -> paragraph
+       }
+
+
+       package jetty.websocket{
+              object ping {
+                   calling from front-end
+              }
+              object listConfigurations {
+                   calling from front-end
+              }
+              object listNotes {
+                  calling from front-end
+              }
+              object getHomeNote {
+                calling from front-end
+              }
+              object getNote  {
+                click on your note from front-end
+              }
+              object runParagraph  {
+                click on run from front-end
+              }
+       }
+
+       object s3NotebookRepo
+       object getNote_{
+            comment:
+                getting note from cache
+       }
+
+       ping ---> notebookServer : consstant polling
+       getNote -----> notebookServer : upon clicking desired notebook
+       notebookServer --> notebook
+
+
+       notebook --> noteManager
+       noteManager --> ifReload
+       ifReload --> noteBookRepoSync : reload flag true updateFromRepo()
+        ifReload --> getNote_ : reload flag false
+
+       getNote_ -> noteManager
+
+       noteBookRepoSync --> vFSNotebookRepo
+       vFSNotebookRepo ----> note : constructParagraph during note init
+
+       note --> paragraph1
+       paragraph1 --> note : postProcessParagraphs()
+
+       note --> paragraph2
+       paragraph2 --> note : postProcessParagraphs()
+
+       note --> vFSNotebookRepo
+       vFSNotebookRepo --> noteBookRepoSync
+       noteBookRepoSync --> noteManager
+       noteBookRepoSync --> s3NotebookRepo
+       s3NotebookRepo --> noteBookRepoSync
+   }
+}
+
+
+@enduml

@@ -1,0 +1,222 @@
+@startuml
+'https://plantuml.com/object-diagram
+
+package mainZeppJVMprocess_PID1{
+   object Thread_main{
+   trace:
+        *jetty.
+        *ZeppelinServer
+   }
+   object Thread_jettyThreads...{
+   }
+   object Thread_RMI_threads...
+   object Thread6{
+    trace:
+        *java.net.ServerSocket
+        *org.apache.thrift
+        *RemoteInterpreterEventServer
+
+   }
+   object ServerConnector{
+       trace:
+           *sun.nio.ServerSocketChannel
+           *jetty.server.*
+
+   }
+
+
+
+   package qtp_S123{
+
+
+       object notebookServer{
+            noteManager
+            __
+            onMessage()
+            |switch:
+                |-->listNotes()
+                *|-->runParagraph()
+                |-->getNote()
+                |-->etc...
+       }
+       object notebook {
+            processNote(id, noteProcessor)
+            saveNote()
+       }
+       object noteManager{
+             loadAndProcessNote()
+             updateFromRepo()
+       }
+
+
+
+
+
+
+
+       package jetty.websocket{
+              object ping {
+                   calling from front-end
+              }
+              object listConfigurations {
+                   calling from front-end
+              }
+              object listNotes {
+                  calling from front-end
+              }
+              object getHomeNote {
+                calling from front-end
+              }
+              object getNote  {
+                click on your note from front-end
+              }
+              object runParagraph  {
+                click on run from front-end
+              }
+       }
+
+
+       object getNote_{
+            comment:
+                getting note from cache
+       }
+       object notebookService{
+            private notebook
+
+            runParagraph()
+       }
+       object note {
+            run()
+       }
+       object paragraph {
+            execute()
+            getScheduler().submit()
+       }
+       object managedInerpreterGroup {
+            getOrCreateSession()
+            comment: create a new session
+            or find existing with interpreter
+       }
+       object abstractScheduler{
+            protected linkedBlockingQueue
+            protected Map<String, job>
+            submit()
+       }
+
+       ping ---> notebookServer : consstant polling
+       runParagraph --> notebookServer : onClick
+       notebookServer --> notebook
+
+
+       notebook ----> noteManager
+
+
+       noteManager -> getNote_
+       getNote_ -> noteManager
+       noteManager -> notebookService
+       notebookService --> note : runParagraph()--> notebook.saveNote
+       note --> paragraph
+       paragraph -> managedInerpreterGroup
+       managedInerpreterGroup -> paragraph
+
+       paragraph --> abstractScheduler
+       abstractScheduler --> noteManager
+
+   }
+
+   package fifoScheduler{
+        object remoteScheduler{
+            run()
+
+        }
+
+       object abstractScheduler_{
+
+       }
+       object job{
+            run()
+       }
+       object paragraph_{
+            jobRun()
+       }
+       object remoteInterpreter{
+             interpret()[
+                **interpreterProcess.callremoteFunction()
+             ]
+       }
+       object pooledRemoteClient{
+            callRemoteFunction()
+       }
+       object remoteInterpreterService{
+            recv_interpret()
+       }
+
+       remoteScheduler --> abstractScheduler_
+       abstractScheduler_ --> job
+       job --> paragraph_
+       paragraph_--> remoteInterpreter
+       remoteInterpreter--> pooledRemoteClient
+        pooledRemoteClient --> remoteInterpreterService
+   }
+
+   package jobStatusPoller_for_paragraph123{
+       object remoteScheduler_{
+            run() [
+                **while () [
+                    ****status = getStatus()]
+                **]
+            onStatusChange()
+            __
+            comment:
+            this thread checks progress of remote interpreter
+       }
+   }
+
+   package pool-3-thread-3{
+       object remoteInterpreterEventService{
+            getResult()
+            __
+            comment:
+            handling events i guess?
+
+       }
+       object remoteInterpreterEventSever{
+            updateAllOutput()
+       }
+       object notebookServer_{
+            onOutputClear()
+       }
+       object notebook_{
+            processNoote()
+       }
+
+       remoteInterpreterEventService--> remoteInterpreterEventSever
+       remoteInterpreterEventSever --> notebookServer_
+       notebookServer_ -->notebook_
+   }
+}
+
+package zeppelin.interpreter.remote.RemoteInterpreterServer_PID2{
+
+    object threadMain
+    object thrift.transportThread
+    object RMI_scheduler{
+        comment:
+        Remote Method Invocation
+    }
+    object RMI_TCP_connection1
+    object RMI_TCP_connection2
+    object parralelScheduler_Worker_1{
+       //todo add frames
+       comment:
+       main thread of execution where JDBC magic happens
+    }
+    object pool_2_thread_2{
+           //todo add frames
+       comment:
+       some configuration is here
+    }
+}
+
+ mainZeppJVMprocess_PID1 --> zeppelin.interpreter.remote.RemoteInterpreterServer_PID2
+@enduml
