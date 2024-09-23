@@ -1,0 +1,664 @@
+@startuml
+class org.apache.zeppelin.scheduler.ExecutorFactory {
++ {static} ExecutorFactory singleton()
++ ExecutorService createOrGet(String,int)
++ ScheduledExecutorService createOrGetScheduled(String,int)
++ ExecutorService getNoteJobExecutor()
++ void shutdown(String)
++ void shutdownAll()
+}
+
+class org.apache.zeppelin.scheduler.ExecutorFactory$InstanceHolder {
+}
+
+class org.apache.zeppelin.notebook.Paragraph {
++ GUI settings
++ Map<String,Paragraph> getUserParagraphMap()
++ Paragraph getUserParagraph(String)
++ void setResult(InterpreterResult)
++ Paragraph cloneParagraphForUser(String)
++ void clearUserParagraphs()
++ void addUser(Paragraph,String)
++ String getUser()
++ String getText()
++ void setText(String)
++ void parseText()
++ AuthenticationInfo getAuthenticationInfo()
++ void setAuthenticationInfo(AuthenticationInfo)
++ String getTitle()
++ void setTitle(String)
++ String getIntpText()
++ String getScriptText()
++ void setNote(Note)
++ Note getNote()
++ Map<String,String> getLocalProperties()
++ boolean isEnabled()
++ Interpreter getBindedInterpreter()
++ void setInterpreter(Interpreter)
++ Interpreter getInterpreter()
++ List<InterpreterCompletion> completion(String,int)
++ int calculateCursorPosition(String,int)
++ InterpreterResult getReturn()
++ int progress()
++ Map<String,Object> info()
++ boolean shouldSkipRunParagraph()
++ boolean execute(boolean)
++ boolean execute(String,boolean)
++ void setStatus(Status)
++ void setStatusToUserParagraph(Status)
++ Map<String,Object> getConfig()
++ void setConfig(Map<String,Object>)
++ void mergeConfig(Map<String,Object>)
++ void updateConfig(Map<String,String>)
++ void setReturn(InterpreterResult,Throwable)
++ ApplicationState createOrGetApplicationState(HeliumPackage)
++ ApplicationState getApplicationState(String)
++ List<ApplicationState> getAllApplicationStates()
++ boolean isValidInterpreter(String)
++ void updateRuntimeInfos(String,String,Map<String,String>,String,String)
++ Map<String,ParagraphRuntimeInfo> getRuntimeInfos()
++ void cleanRuntimeInfos()
++ void cleanOutputBuffer()
++ void checkpointOutput()
++ void waitUntilFinished()
++ void waitUntilRunning()
++ boolean equals(Object)
++ int hashCode()
++ String toJson()
++ Paragraph fromJson(String)
++ void updateOutputBuffer(int,InterpreterResult.Type,String)
++ void recover()
++ void setInterpreterNotFound(InterpreterNotFoundException)
++ void setUnexpectedException(Throwable)
+}
+
+
+abstract class org.apache.zeppelin.scheduler.Job {
++ void setId(String)
++ String getId()
++ int hashCode()
++ boolean equals(Object)
++ Status getStatus()
++ void setStatusWithoutNotification(Status)
++ void setStatus(Status)
++ void setListener(JobListener)
++ JobListener getListener()
++ boolean isTerminated()
++ boolean isRunning()
++ void onJobStarted()
++ void onJobEnded()
++ void run()
++ Throwable getException()
++ {abstract}T getReturn()
++ String getJobName()
++ void setJobName(String)
++ {abstract}int progress()
++ {abstract}Map<String,Object> info()
++ void abort()
++ boolean isAborted()
++ Date getDateCreated()
++ Date getDateStarted()
++ void setDateStarted(Date)
++ Date getDateFinished()
++ void setDateFinished(Date)
++ {abstract}void setResult(T)
++ String getErrorMessage()
++ void setErrorMessage(String)
+}
+
+enum org.apache.zeppelin.scheduler.Status {
++  UNKNOWN
++  READY
++  PENDING
++  RUNNING
++  FINISHED
++  ERROR
++  ABORT
++ boolean isReady()
++ boolean isRunning()
++ boolean isPending()
++ boolean isCompleted()
++ boolean isAbort()
++ boolean isFailed()
+}
+
+
+class org.apache.zeppelin.notebook.repo.GitNotebookRepo {
++ void init(ZeppelinConfiguration,NoteParser)
++ void move(String,String,String,AuthenticationInfo)
++ void move(String,String,AuthenticationInfo)
++ void remove(String,String,AuthenticationInfo)
++ void remove(String,AuthenticationInfo)
++ Revision checkpoint(String,String,String,AuthenticationInfo)
++ Note get(String,String,String,AuthenticationInfo)
++ List<Revision> revisionHistory(String,String,AuthenticationInfo)
++ Note setNoteRevision(String,String,String,AuthenticationInfo)
++ void close()
+}
+
+class org.apache.zeppelin.notebook.FileSystemStorage {
++ boolean isS3AFileSystem(URI,URI)
++ FileSystem getFs()
++ Path makeQualified(Path)
++ boolean exists(Path)
++ void tryMkDir(Path)
++ List<Path> list(Path)
++ List<Path> listAll(Path)
++ boolean delete(Path)
++ String readFile(Path)
++ void writeFile(String,Path,boolean)
++ void writeFile(String,Path,boolean,Set<PosixFilePermission>)
++ void move(Path,Path)
++ T callHdfsOperation(HdfsOperation<T>)
+}
+
+interface org.apache.zeppelin.notebook.FileSystemStorage$HdfsOperation {
+}
+class org.apache.zeppelin.notebook.NoteManager {
++ {static} String TRASH_FOLDER
++ Map<String,String> getNotesInfo()
++ void reloadNotes()
++ int getCacheSize()
++ boolean containsNote(String)
++ boolean containsFolder(String)
++ void saveNote(Note,AuthenticationInfo)
++ void addNote(Note,AuthenticationInfo)
++ void saveNote(Note)
++ void removeNote(String,AuthenticationInfo)
++ void moveNote(String,String,AuthenticationInfo)
++ void moveFolder(String,String,AuthenticationInfo)
++ List<NoteInfo> removeFolder(String,AuthenticationInfo)
++ T processNote(String,boolean,NoteProcessor<T>)
++ T processNote(String,NoteProcessor<T>)
++ Folder getOrCreateFolder(String)
++ Folder getTrashFolder()
++ String getNoteIdByPath(String)
+}
+
+
+class org.apache.zeppelin.notebook.NoteManager$Folder {
++ Folder getOrCreateFolder(String)
++ Folder getParent()
++ void setParent(Folder)
++ String getName()
++ void setName(String)
++ Folder getFolder(String)
++ Map<String,Folder> getFolders()
++ NoteNode getNote(String)
++ void addNote(String,NoteInfo)
++ void addFolder(String,Folder)
++ boolean containsNote(String)
++ void addNoteNode(NoteNode)
++ void removeNote(String)
++ List<NoteInfo> removeFolder(String,AuthenticationInfo)
++ List<NoteInfo> getNoteInfoRecursively()
++ List<NoteNode> getNoteNodeRecursively()
++ Map<String,NoteNode> getNotes()
++ String getPath()
++ String toString()
+}
+
+class org.apache.zeppelin.notebook.NoteManager$NoteNode {
++ T loadAndProcessNote(boolean,NoteProcessor<T>)
++ String getNoteId()
++ String getNoteName()
++ String getNotePath()
++ NoteInfo getNoteInfo()
++ Folder getParent()
++ String toString()
++ void setParent(Folder)
++ void setNotePath(String)
++ void updateNotePath()
+}
+
+class org.apache.zeppelin.notebook.NoteManager$NoteCache {
++ int getSize()
++ Note getNote(String)
++ void putNote(Note)
++ Note removeNote(String)
+}
+
+class org.apache.zeppelin.notebook.NoteManager$NoteCache$LRUCache {
+}
+interface org.apache.zeppelin.notebook.repo.NotebookRepo {
+}
+class org.apache.zeppelin.notebook.scheduler.QuartzSchedulerService {
++ boolean refreshCron(String)
++ int getJobsSize()
+}
+
+interface org.apache.zeppelin.notebook.repo.NotebookRepoWithVersionControl {
+}
+class org.apache.zeppelin.notebook.repo.NotebookRepoWithVersionControl$Revision {
++ {static} Revision EMPTY
++ String id
++ String message
++ int time
++ {static} boolean isEmpty(Revision)
+}
+
+
+class org.apache.zeppelin.scheduler.FIFOScheduler {
++ void runJobInScheduler(Job<?>)
++ void stop()
++ void stop(int,TimeUnit)
+}
+
+class org.apache.zeppelin.notebook.scheduler.ZeppelinCronJobTriggerListerner {
++ String getName()
++ void triggerFired(Trigger,JobExecutionContext)
++ boolean vetoJobExecution(Trigger,JobExecutionContext)
++ void triggerMisfired(Trigger)
++ void triggerComplete(Trigger,JobExecutionContext,CompletedExecutionInstruction)
+}
+
+class org.apache.zeppelin.notebook.repo.NotebookRepoSettingsInfo {
++ Type type
++ List<Map<String,String>> value
++ String selected
++ String name
++ {static} NotebookRepoSettingsInfo newInstance()
+}
+
+
+enum org.apache.zeppelin.notebook.repo.Type {
++  INPUT
++  DROPDOWN
+}
+
+class org.apache.zeppelin.notebook.scheduler.NoSchedulerService {
++ boolean refreshCron(String)
++ int getJobsSize()
+}
+
+class org.apache.zeppelin.notebook.Note {
++ String getPath()
++ String getParentPath()
++ boolean isParagraphRunning()
++ boolean isPersonalizedMode()
++ void setPersonalizedMode(Boolean)
++ String getId()
++ void setId(String)
++ String getName()
++ void setPath(String)
++ void setVersion(String)
++ String getDefaultInterpreterGroup()
++ void setDefaultInterpreterGroup(String)
++ Map<String,Object> getNoteParams()
++ void setNoteParams(Map<String,Object>)
++ Map<String,Input> getNoteForms()
++ void setNoteForms(Map<String,Input>)
++ void setName(String)
++ InterpreterFactory getInterpreterFactory()
++ void setInterpreterFactory(InterpreterFactory)
++ boolean isCronSupported(ZeppelinConfiguration)
++ void setCronSupported(ZeppelinConfiguration)
++ Credentials getCredentials()
++ void setCredentials(Credentials)
++ List<AngularObject> getAngularObjects(String)
++ void addOrUpdateAngularObject(String,AngularObject)
++ void deleteAngularObject(String,String,String,String)
++ Paragraph addNewParagraph(AuthenticationInfo)
++ void fireParagraphCreateEvent(Paragraph)
++ void fireParagraphRemoveEvent(Paragraph)
++ void fireParagraphUpdateEvent(Paragraph)
++ Paragraph insertNewParagraph(int,AuthenticationInfo)
++ void addParagraph(Paragraph)
++ Paragraph removeParagraph(String,String)
++ void clearParagraphOutputFields(Paragraph)
++ Paragraph clearPersonalizedParagraphOutput(String,String)
++ Paragraph clearParagraphOutput(String)
++ void clearAllParagraphOutput()
++ void moveParagraph(String,int)
++ void moveParagraph(String,int,boolean)
++ boolean isLastParagraph(String)
++ int getParagraphCount()
++ Paragraph getParagraph(String)
++ Paragraph getParagraph(int)
++ Paragraph getLastParagraph()
++ void runAll(AuthenticationInfo,boolean,boolean,Map<String,Object>)
++ boolean run(String)
++ boolean run(String,boolean)
++ boolean run(String,String,boolean,String)
++ boolean haveRunningOrPendingParagraphs()
++ boolean isTrash()
++ List<InterpreterCompletion> completion(String,String,int,AuthenticationInfo)
++ List<Paragraph> getParagraphs()
++ List<InterpreterSetting> getBindedInterpreterSettings(List<String>)
++ List<InterpreterSetting> getUsedInterpreterSettings()
++ Note getUserNote(String)
++ Map<String,Object> getConfig()
++ void setConfig(Map<String,Object>)
++ Map<String,Object> getInfo()
++ void setInfo(Map<String,Object>)
++ void setRunning(boolean)
++ void setIsolatedMode(boolean)
++ boolean isIsolatedMode()
++ void setStartTime(String)
++ String getStartTime()
++ void clearStartTime()
++ boolean isRunning()
++ String toString()
++ String toJson()
++ void postProcessParagraphs()
++ boolean equals(Object)
++ int hashCode()
++ void setNoteEventListeners(List<NoteEventListener>)
++ ReentrantReadWriteLock getLock()
++ void setRemoved(boolean)
++ boolean isRemoved()
++ ExecutionContext getExecutionContext()
++ NoteParser getNoteParser()
++ void setZeppelinConfiguration(ZeppelinConfiguration)
++ void setNoteParser(NoteParser)
+}
+
+interface org.apache.zeppelin.scheduler.JobListener {
+}
+class org.apache.zeppelin.notebook.repo.NotebookRepoWithSettings {
++ {static} NotebookRepoWithSettings EMPTY
++ String name
++ String className
++ List<NotebookRepoSettingsInfo> settings
++ {static} Builder builder(String)
++ boolean isEmpty()
+}
+
+
+class org.apache.zeppelin.notebook.repo.NotebookRepoWithSettings$Builder {
++ NotebookRepoWithSettings build()
++ Builder className(String)
++ Builder settings(List<NotebookRepoSettingsInfo>)
+}
+
+interface org.apache.zeppelin.notebook.NoteEventListener {
+}
+class org.apache.zeppelin.notebook.scheduler.CronJob {
++ void execute(JobExecutionContext)
+}
+
+abstract class org.apache.zeppelin.scheduler.AbstractScheduler {
++ String getName()
++ List<Job<?>> getAllJobs()
++ Job<?> getJob(String)
++ void submit(Job<?>)
++ Job<?> cancel(String)
++ void run()
++ {abstract}void runJobInScheduler(Job<?>)
++ void stop()
+}
+
+abstract class org.apache.zeppelin.scheduler.JobWithProgressPoller {
++ void onJobStarted()
++ void onJobEnded()
+}
+
+class org.apache.zeppelin.notebook.repo.InMemoryNotebookRepo {
++ void init(ZeppelinConfiguration,NoteParser)
++ Map<String,NoteInfo> list(AuthenticationInfo)
++ Note get(String,String,AuthenticationInfo)
++ void save(Note,AuthenticationInfo)
++ void move(String,String,String,AuthenticationInfo)
++ void move(String,String,AuthenticationInfo)
++ void remove(String,String,AuthenticationInfo)
++ void remove(String,AuthenticationInfo)
++ void close()
++ List<NotebookRepoSettingsInfo> getSettings(AuthenticationInfo)
++ void updateSettings(Map<String,String>,AuthenticationInfo)
++ void reset()
+}
+
+interface org.apache.zeppelin.notebook.scheduler.SchedulerService {
+}
+abstract class org.apache.zeppelin.notebook.NoteEventAsyncListener {
++ {abstract}void handleNoteCreateEvent(NoteCreateEvent)
++ {abstract}void handleNoteRemoveEvent(NoteRemoveEvent)
++ {abstract}void handleNoteUpdateEvent(NoteUpdateEvent)
++ {abstract}void handleParagraphCreateEvent(ParagraphCreateEvent)
++ {abstract}void handleParagraphRemoveEvent(ParagraphRemoveEvent)
++ {abstract}void handleParagraphUpdateEvent(ParagraphUpdateEvent)
++ void close()
++ void onNoteCreate(Note,AuthenticationInfo)
++ void onNoteRemove(Note,AuthenticationInfo)
++ void onNoteUpdate(Note,AuthenticationInfo)
++ void onParagraphCreate(Paragraph)
++ void onParagraphRemove(Paragraph)
++ void onParagraphUpdate(Paragraph)
++ void onParagraphStatusChange(Paragraph,Job.Status)
++ boolean isEventQueueEmpty()
+}
+
+class org.apache.zeppelin.notebook.NoteEventAsyncListener$EventHandling {
++ void run()
+}
+
+interface org.apache.zeppelin.notebook.NoteEventAsyncListener$NoteEvent {
+}
+class org.apache.zeppelin.notebook.NoteEventAsyncListener$NoteCreateEvent {
++ String getNoteId()
+}
+
+class org.apache.zeppelin.notebook.NoteEventAsyncListener$NoteUpdateEvent {
++ String getNoteId()
+}
+
+class org.apache.zeppelin.notebook.NoteEventAsyncListener$NoteRemoveEvent {
++ String getNoteId()
+}
+
+class org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphCreateEvent {
++ String getNodeId()
++ String getParagraphId()
+}
+
+class org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphUpdateEvent {
++ String getNodeId()
++ String getParagraphId()
+}
+
+class org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphRemoveEvent {
++ String getNodeId()
++ String getParagraphId()
+}
+
+class org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphStatusChangeEvent {
++ String getNodeId()
++ String getParagraphId()
+}
+
+class org.apache.zeppelin.notebook.scheduler.MetricCronJobListener {
++ String getName()
++ void jobToBeExecuted(JobExecutionContext)
++ void jobExecutionVetoed(JobExecutionContext)
++ void jobWasExecuted(JobExecutionContext,JobExecutionException)
+}
+
+interface org.apache.zeppelin.scheduler.Scheduler {
+}
+class org.apache.zeppelin.scheduler.ParallelScheduler {
++ void runJobInScheduler(Job<?>)
++ void stop()
++ void stop(int,TimeUnit)
+}
+
+class org.apache.zeppelin.notebook.repo.VFSNotebookRepo {
++ void init(ZeppelinConfiguration,NoteParser)
++ Map<String,NoteInfo> list(AuthenticationInfo)
++ Note get(String,String,AuthenticationInfo)
++ void save(Note,AuthenticationInfo)
++ void move(String,String,String,AuthenticationInfo)
++ void move(String,String,AuthenticationInfo)
++ void remove(String,String,AuthenticationInfo)
++ void remove(String,AuthenticationInfo)
++ void close()
++ List<NotebookRepoSettingsInfo> getSettings(AuthenticationInfo)
++ void updateSettings(Map<String,String>,AuthenticationInfo)
+}
+
+abstract class org.apache.zeppelin.notebook.repo.AbstractNotebookRepo {
++ void init(ZeppelinConfiguration,NoteParser)
++ NoteParser getNoteParser()
+}
+
+class org.apache.zeppelin.notebook.repo.NotebookRepoSync {
++ void init(ZeppelinConfiguration,NoteParser)
++ List<NotebookRepoWithSettings> getNotebookRepos(AuthenticationInfo)
++ NotebookRepoWithSettings updateNotebookRepo(String,Map<String,String>,AuthenticationInfo)
++ Map<String,NoteInfo> list(AuthenticationInfo)
++ Note get(String,String,AuthenticationInfo)
++ void save(Note,AuthenticationInfo)
++ void move(String,String,String,AuthenticationInfo)
++ void move(String,String,AuthenticationInfo)
++ void remove(String,String,AuthenticationInfo)
++ void remove(String,AuthenticationInfo)
++ void sync(AuthenticationInfo)
++ int getRepoCount()
++ NotebookRepo getRepo(int)
++ void close()
++ boolean isRevisionSupportedInDefaultRepo()
++ boolean isRevisionSupportedInRepo(int)
++ Revision checkpoint(String,String,String,AuthenticationInfo)
++ Note get(String,String,String,AuthenticationInfo)
++ List<Revision> revisionHistory(String,String,AuthenticationInfo)
++ List<NotebookRepoSettingsInfo> getSettings(AuthenticationInfo)
++ void updateSettings(Map<String,String>,AuthenticationInfo)
++ Note setNoteRevision(String,String,String,AuthenticationInfo)
++ NoteParser getNoteParser()
+}
+
+class org.apache.zeppelin.scheduler.RemoteScheduler {
++ void runJobInScheduler(Job<?>)
++ void stop(int,TimeUnit)
+}
+
+class org.apache.zeppelin.scheduler.RemoteScheduler$JobStatusPoller {
++ void run()
++ void shutdown()
++ Status getStatus()
+}
+
+class org.apache.zeppelin.scheduler.RemoteScheduler$JobRunner {
++ boolean isJobSubmittedInRemote()
++ boolean isJobExecuted()
++ void run()
++ void onProgressUpdate(Job<?>,int)
++ void onStatusChange(Job<?>,Status,Status)
+}
+
+class org.apache.zeppelin.scheduler.JobProgressPoller {
++ {static} long DEFAULT_INTERVAL_MSEC
++ void run()
+}
+
+
+class org.apache.zeppelin.notebook.Notebook {
++ void recoveryIfNecessary()
++ void addInitConsumer(Consumer<String>)
++ void initNotebook()
++ boolean waitForFinishInit(long,TimeUnit)
++ NoteManager getNoteManager()
++ void setParagraphJobListener(ParagraphJobListener)
++ String createNote(String,AuthenticationInfo)
++ String createNote(String,AuthenticationInfo,boolean)
++ String createNote(String,String,AuthenticationInfo)
++ String createNote(String,String,AuthenticationInfo,boolean)
++ String exportNote(String)
++ String importNote(String,String,AuthenticationInfo)
++ String cloneNote(String,String,AuthenticationInfo)
++ String cloneNote(String,String,String,AuthenticationInfo)
++ void removeCorruptedNote(String,AuthenticationInfo)
++ void removeNote(String,AuthenticationInfo)
++ T processNote(String,NoteProcessor<T>)
++ T processNote(String,boolean,NoteProcessor<T>)
++ String getNoteIdByPath(String)
++ void saveNote(Note,AuthenticationInfo)
++ void updateNote(Note,AuthenticationInfo)
++ boolean containsNoteById(String)
++ boolean containsNote(String)
++ boolean containsFolder(String)
++ void moveNote(String,String,AuthenticationInfo)
++ void moveFolder(String,String,AuthenticationInfo)
++ void removeFolder(String,AuthenticationInfo)
++ void emptyTrash(AuthenticationInfo)
++ void restoreAll(AuthenticationInfo)
++ Revision checkpointNote(String,String,String,AuthenticationInfo)
++ List<Revision> listRevisionHistory(String,String,AuthenticationInfo)
++ Note setNoteRevision(String,String,String,AuthenticationInfo)
++ Note getNoteByRevision(String,String,String,AuthenticationInfo)
++ Note loadNoteFromRepo(String,AuthenticationInfo)
++ void reloadAllNotes(AuthenticationInfo)
++ List<NoteInfo> getNotesInfo()
++ List<NoteInfo> getNotesInfo(Predicate<String>)
++ List<InterpreterSetting> getBindedInterpreterSettings(String)
++ InterpreterFactory getInterpreterFactory()
++ InterpreterSettingManager getInterpreterSettingManager()
++ ZeppelinConfiguration getConf()
++ void close()
++ void addNotebookEventListener(NoteEventListener)
++ Boolean isRevisionSupported()
+}
+
+class org.apache.zeppelin.notebook.Notebook$SnapshotAngularObject {
+}
+interface org.apache.zeppelin.notebook.Notebook$NoteProcessor {
+}
+
+
+org.apache.zeppelin.scheduler.ExecutorFactory +.. org.apache.zeppelin.scheduler.ExecutorFactory$InstanceHolder
+
+org.apache.zeppelin.scheduler.JobWithProgressPoller <|-- org.apache.zeppelin.notebook.Paragraph
+org.apache.zeppelin.notebook.repo.NotebookRepoWithVersionControl <|.. org.apache.zeppelin.notebook.repo.GitNotebookRepo
+org.apache.zeppelin.notebook.repo.VFSNotebookRepo <|-- org.apache.zeppelin.notebook.repo.GitNotebookRepo
+org.apache.zeppelin.notebook.FileSystemStorage +.. org.apache.zeppelin.notebook.FileSystemStorage$HdfsOperation
+org.apache.zeppelin.notebook.NoteManager +.. org.apache.zeppelin.notebook.NoteManager$Folder
+org.apache.zeppelin.notebook.NoteManager +.. org.apache.zeppelin.notebook.NoteManager$NoteNode
+org.apache.zeppelin.notebook.NoteManager +.. org.apache.zeppelin.notebook.NoteManager$NoteCache
+org.apache.zeppelin.notebook.NoteManager$NoteCache +.. org.apache.zeppelin.notebook.NoteManager$NoteCache$LRUCache
+org.apache.zeppelin.notebook.LinkedHashMap <|-- org.apache.zeppelin.notebook.NoteManager$NoteCache$LRUCache
+
+org.apache.zeppelin.notebook.scheduler.SchedulerService <|.. org.apache.zeppelin.notebook.scheduler.QuartzSchedulerService
+org.apache.zeppelin.notebook.repo.NotebookRepo <|-- org.apache.zeppelin.notebook.repo.NotebookRepoWithVersionControl
+org.apache.zeppelin.notebook.repo.NotebookRepoWithVersionControl +.. org.apache.zeppelin.notebook.repo.NotebookRepoWithVersionControl$Revision
+org.apache.zeppelin.scheduler.AbstractScheduler <|-- org.apache.zeppelin.scheduler.FIFOScheduler
+org.quartz.TriggerListener <|.. org.apache.zeppelin.notebook.scheduler.ZeppelinCronJobTriggerListerner
+org.apache.zeppelin.notebook.scheduler.SchedulerService <|.. org.apache.zeppelin.notebook.scheduler.NoSchedulerService
+org.apache.zeppelin.common.JsonSerializable <|.. org.apache.zeppelin.notebook.Note
+org.apache.zeppelin.notebook.repo.NotebookRepoWithSettings +.. org.apache.zeppelin.notebook.repo.NotebookRepoWithSettings$Builder
+org.apache.zeppelin.notebook.scheduler.Job <|.. org.apache.zeppelin.notebook.scheduler.CronJob
+org.apache.zeppelin.scheduler.Scheduler <|.. org.apache.zeppelin.scheduler.AbstractScheduler
+org.apache.zeppelin.scheduler.Job <|-- org.apache.zeppelin.scheduler.JobWithProgressPoller
+org.apache.zeppelin.notebook.repo.AbstractNotebookRepo <|-- org.apache.zeppelin.notebook.repo.InMemoryNotebookRepo
+org.apache.zeppelin.notebook.NoteEventListener <|.. org.apache.zeppelin.notebook.NoteEventAsyncListener
+org.apache.zeppelin.notebook.NoteEventAsyncListener +.. org.apache.zeppelin.notebook.NoteEventAsyncListener$EventHandling
+org.apache.zeppelin.notebook.Runnable <|.. org.apache.zeppelin.notebook.NoteEventAsyncListener$EventHandling
+org.apache.zeppelin.notebook.NoteEventAsyncListener +.. org.apache.zeppelin.notebook.NoteEventAsyncListener$NoteEvent
+org.apache.zeppelin.notebook.NoteEventAsyncListener +.. org.apache.zeppelin.notebook.NoteEventAsyncListener$NoteCreateEvent
+org.apache.zeppelin.notebook.NoteEvent <|.. org.apache.zeppelin.notebook.NoteEventAsyncListener$NoteCreateEvent
+org.apache.zeppelin.notebook.NoteEventAsyncListener +.. org.apache.zeppelin.notebook.NoteEventAsyncListener$NoteUpdateEvent
+org.apache.zeppelin.notebook.NoteEvent <|.. org.apache.zeppelin.notebook.NoteEventAsyncListener$NoteUpdateEvent
+org.apache.zeppelin.notebook.NoteEventAsyncListener +.. org.apache.zeppelin.notebook.NoteEventAsyncListener$NoteRemoveEvent
+org.apache.zeppelin.notebook.NoteEvent <|.. org.apache.zeppelin.notebook.NoteEventAsyncListener$NoteRemoveEvent
+org.apache.zeppelin.notebook.NoteEventAsyncListener +.. org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphCreateEvent
+org.apache.zeppelin.notebook.NoteEvent <|.. org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphCreateEvent
+org.apache.zeppelin.notebook.NoteEventAsyncListener +.. org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphUpdateEvent
+org.apache.zeppelin.notebook.NoteEvent <|.. org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphUpdateEvent
+org.apache.zeppelin.notebook.NoteEventAsyncListener +.. org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphRemoveEvent
+org.apache.zeppelin.notebook.NoteEvent <|.. org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphRemoveEvent
+org.apache.zeppelin.notebook.NoteEventAsyncListener +.. org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphStatusChangeEvent
+org.apache.zeppelin.notebook.NoteEvent <|.. org.apache.zeppelin.notebook.NoteEventAsyncListener$ParagraphStatusChangeEvent
+org.quartz.JobListener <|.. org.apache.zeppelin.notebook.scheduler.MetricCronJobListener
+org.apache.zeppelin.scheduler.Runnable <|-- org.apache.zeppelin.scheduler.Scheduler
+org.apache.zeppelin.scheduler.AbstractScheduler <|-- org.apache.zeppelin.scheduler.ParallelScheduler
+org.apache.zeppelin.notebook.repo.AbstractNotebookRepo <|-- org.apache.zeppelin.notebook.repo.VFSNotebookRepo
+org.apache.zeppelin.notebook.repo.NotebookRepo <|.. org.apache.zeppelin.notebook.repo.AbstractNotebookRepo
+org.apache.zeppelin.notebook.repo.NotebookRepoWithVersionControl <|.. org.apache.zeppelin.notebook.repo.NotebookRepoSync
+org.apache.zeppelin.scheduler.AbstractScheduler <|-- org.apache.zeppelin.scheduler.RemoteScheduler
+org.apache.zeppelin.scheduler.RemoteScheduler +.. org.apache.zeppelin.scheduler.RemoteScheduler$JobStatusPoller
+org.apache.zeppelin.scheduler.Thread <|-- org.apache.zeppelin.scheduler.RemoteScheduler$JobStatusPoller
+org.apache.zeppelin.scheduler.RemoteScheduler +.. org.apache.zeppelin.scheduler.RemoteScheduler$JobRunner
+org.apache.zeppelin.scheduler.Runnable <|.. org.apache.zeppelin.scheduler.RemoteScheduler$JobRunner
+org.apache.zeppelin.scheduler.JobListener <|.. org.apache.zeppelin.scheduler.RemoteScheduler$JobRunner
+org.apache.zeppelin.scheduler.Thread <|-- org.apache.zeppelin.scheduler.JobProgressPoller
+org.apache.zeppelin.notebook.Notebook +.. org.apache.zeppelin.notebook.Notebook$SnapshotAngularObject
+org.apache.zeppelin.notebook.Notebook +.. org.apache.zeppelin.notebook.Notebook$NoteProcessor
+@enduml
