@@ -1,0 +1,217 @@
+@startuml
+'https://plantuml.com/object-diagram
+'
+'   object Thread_main{
+ '   trace:
+ '        *jetty.
+ '        *ZeppelinServer
+ '   }
+'
+'   object Thread_jettyThreads...{
+ '   }
+'
+'   object Thread6{
+ '    trace:
+ '        *java.net.ServerSocket
+ '        *org.apache.thrift
+ '        *RemoteInterpreterEventServer
+ '
+ '   }
+'
+'   object ServerConnector{
+ '       trace:
+ '           *sun.nio.ServerSocketChannel
+ '           *jetty.server.*
+ '
+ '   }
+'
+'   object Thread_RMI_threads...
+'
+
+
+
+        package something_PID{
+            object what_is_it_PID {
+                отдельный процесс JVM
+            }
+
+                package something{
+                    object what_is_it {
+                        часть кода
+                        (выполняется параллельно)
+                    }
+                }
+
+        }
+
+package RemoteInterpreterServer_PID2{
+
+    object parralelScheduler_Worker_1{
+        удалённый интерпретатор на поде в кластере
+    }
+
+}
+
+package mainZeppJVMprocess_PID1{
+
+
+    class C
+    class D
+    C --> D : исполнение внтури потока
+
+
+
+   package fifoScheduler{
+
+        object remoteScheduler{
+            данный класс является Proxy (представителем)
+            такого же класса в интерпретаторе на другой JVM
+            Он запускает следующий Job только
+            "after the current job is submitted to remote"
+            __
+            remoteScheduler()
+            в конструкторе создаём "очередь" через
+            Executors.newSingleThreadExecutor
+            __
+            run()
+
+        }
+
+       object abstractScheduler_{
+            |runJob(paragraph)
+            |->paragraph.setResult устанавливаем результат работы
+       }
+       object job{
+            run()
+       }
+       object paragraph_{
+           InterpreterResult jobRun()
+           тут возвращается InterpreterResult - промежуточное состояние?
+           p.setResult() далее параграфу из конкретного ноутбука присваивается результат
+       }
+       object remoteInterpreter{
+             interpret()[
+                **interpreterProcess.callremoteFunction()
+             ]
+       }
+       object pooledRemoteClient{
+            callRemoteFunction()
+       }
+       object remoteInterpreterService{
+            recv_interpret()
+       }
+
+       remoteScheduler --> abstractScheduler_
+       abstractScheduler_ --> job
+       job --> paragraph_
+       paragraph_--> remoteInterpreter
+       remoteInterpreter--> pooledRemoteClient
+        pooledRemoteClient --> remoteInterpreterService
+        paragraph_ ---> abstractScheduler_
+   }
+
+   package jobStatusPoller_for_paragraph123{
+       object remoteScheduler_{
+            |run()
+            |-> status = getStatus()
+            данный поток крутится до тех пор, пока
+            статус PENDING, далее останавливается
+       }
+       object remoteInterpreterService_{
+            callRemoteFunction()
+            звоним через RPC и thrift в удалённый процесс
+       }
+
+       remoteScheduler_ --> remoteInterpreterService_
+   }
+
+
+   package process1{
+
+       object notebookServer{
+            |runParagraph()
+            |-> получение String noteId
+            |-> получение String text
+            |-> получение Map params
+            |-> получение Map config
+            getNotebook().processNote(n->runParagraph()) запуск параграфа
+       }
+       object notebookㅤㅤ{
+            processNote(id, noteProcessor)
+            saveNote()
+       }
+       object noteManager{
+             |loadAndProcessNote()
+             |->подгружаем из репозитория note = updateFromRepo()
+             |->либо берём из кэша note = noteCache.getNote()
+       }
+       object notebookㅤ{
+            дополняем объект note параметрами, которые
+            не сохраняются в хранилище
+            |processNote()
+            |->note.setInterpreterFactory()
+            |->note.setInterpreterSettingManager()
+            |->note.setParagraphJobListener()
+            |->note.setNoteEventListener()
+            |->note.setCredentials()
+       }
+       object notebookService{
+             runParagraph()
+             проверяем пермишшены на запуск конкретного параграфа->
+             получаем параграф по ID из ноутбука->
+             p.setText(text) задаём параграфу необходимые поля
+             p.setTitle() задаём параграфу необходимые поля
+             p.setAuthenticationInfo() задаём параграфу необходимые поля
+             notebook.saveNote() сохраняем ноутбук в хранилище (например S3)
+             note.run() запускаем ноутбук
+       }
+       object note {
+             p = getParagraph(paragraphId) получаем параграф по ID
+             p.setListener() ставим листенер
+             p.execute() запускаем параграф
+       }
+       object paragraph {
+             p = getParagraph(paragraphId) получаем параграф по ID
+             p.setListener() ставим листенер
+             p.execute() запускаем параграф
+       }
+       object managedInterpreterGroup {
+             Map<String, List<Interpreter>> sessions = ConcurrentHashMap хранит в себе сессии
+             __
+             getOrCreateSession() создаётся или ищется сессия с интерпретатором
+       }
+       object remoteInterpreter_{
+            представляет собой Proxy (представителя)
+            удалённого интерпретатора на другой JVM
+            (на схеме RemoteInterpreterServer_PID2)
+       }
+
+
+       notebookServer --> notebookㅤㅤ
+       notebookㅤㅤ --> noteManager
+       noteManager --> notebookㅤ
+       notebookㅤ--> notebookService
+       notebookService --> note
+       note --> paragraph
+       paragraph -> interpreterFactory
+       interpreterFactory -> interpreterSetting
+       interpreterSetting -> managedInterpreterGroup
+       managedInterpreterGroup --> remoteInterpreter_
+
+   }
+
+        process1 -> jobStatusPoller_for_paragraph123 #red
+        process1 ---> fifoScheduler #red
+}
+
+
+       mainZeppJVMprocess_PID1 -> parralelScheduler_Worker_1 #red
+       fifoScheduler --> parralelScheduler_Worker_1 #red
+       jobStatusPoller_for_paragraph123 ---> parralelScheduler_Worker_1 #red
+
+    class A
+    class B
+
+    A -> B #red : создаётся после \n завершения process1.notebookServer
+
+@enduml
