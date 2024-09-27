@@ -1,0 +1,83 @@
+@startuml
+'https://plantuml.com/object-diagram
+
+
+package остановка_через_группы_интерперетаторов{
+
+       class InterpreterSetting{
+            репрезентация настроек отдельного! интерпретатора
+            __
+            +id ex:("adp_livy")
+            +name ex:("adp_livy")
+            +group ex:("livy")
+       }
+
+       class ManagedInterpreterGroup{
+            репрезентация группы интерпретаторов
+       }
+
+
+       object browser{
+            в списке групп интерпретаторов (srv/#/interpreter)
+            нажимаем на одном значок Restart
+            напротив соответствующего интерпретатора
+       }
+       object interpreterRestApi{
+            @Path("setting/restart/{settingID}")
+            +restartSetting() внутри получаем объект interpreterSetting через
+            InterptereterSettingManager -> проверка разрешений
+            +interpreterSettingManager.close(settingID)
+       }
+       object interpreterSettingManager{
+            +interpreterSettingManager.close(settingID)
+       }
+
+
+
+       object interpreterSetting{
+            +ConcurrentHashMap<String, ManagedInterpreterGroup> interpreterGroups
+            __
+            +close(Collection<ManagedInterpreterGroup>){
+            создаём close-Thread's по количеству групп интерпретаторов на сервере.
+            в каждом из потоков вызывается:
+            +managedInterpreterGroup.close() потом
+            +interpreterGroups.clear() - очищаем карту
+            Дожидаемся окончания работы всех close-Thread's
+       }
+       object managedInterpreterGroup{
+            +close(sessionID){
+            +sessions.remove(sessionID) - удаляем сессию с интерпретатором из списка сессий
+            +close(sessionID) интерпретаторы удалённой сессии передаются в метод
+            close(Collection<Interpreter>)
+            __
+            +close(Collection<Interpreter>){
+            создаём close-Thread's по количеству интерпретаторов в ноутбуке.
+            в каждом из потоков вызывается:
+
+            +closeInterpreter(Interpreter)
+            внутри которого мы проходимся по Job и каждый ставим в статус ABORT и вызываем
+            +interpreter.close() закрывая конкретную реализацию интерпретатора
+
+           Дожидаемся окончания работы всех close-Thread's
+            __
+               interpreterSetting.removeInterpreterGroup(id) удаляем объект группы интерпретаторов из настроек
+                remoteInterpreterProcess.stop()
+       }
+       object RemoteInterpreterManagedProcess{
+            +stop()
+            +callremoteFunction(client-> {client.shutdown()} RPC в удалённый интерпретатор
+
+       }
+
+       browser <-->interpreterRestApi : PUT REST call to \n .../api/interpterter/setting/restart/{intrprtName} \n message: ""
+       interpreterRestApi <--> interpreterSettingManager
+
+
+       interpreterSettingManager <--> interpreterSetting
+       interpreterSetting --> managedInterpreterGroup
+       managedInterpreterGroup <--> RemoteInterpreterManagedProcess
+       managedInterpreterGroup --> interpreterSetting
+}
+
+
+@enduml

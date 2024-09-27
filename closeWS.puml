@@ -1,0 +1,52 @@
+@startuml
+'https://plantuml.com/object-diagram
+
+
+package остановка_через_WebSocket{
+
+
+
+       object browser{
+            в браузере ctrl+alt+c -> посылается запрос на обработку
+            WebSocket события
+       }
+       object notebookServer{
+            +cancelParagraph()
+       }
+       object notebookService{
+            +cancelParagraph() проверяем уровень доступа
+            далее внутри метода выполняем
+            +paragraph.abort()
+       }
+       object notebook{
+            +processNote() создаём объект note и задаём поля
+            InterpreterFactory, InterptereterSettingManager итд.
+       }
+       object noteManager{
+            +processNote()->loadAndProcessNote()
+            забираем ноутбук из кэша
+       }
+       object paragraph{
+            +jobAbort() ->
+            +getInterpreterContext()
+       }
+       object remoteInterpreter{
+            +cancel() ->
+            +getOrCreateInterpreterProcess()
+       }
+       object remoteInterpreterService {
+            +cancel() - RPC call в удалённый интерпретатор
+       }
+
+
+       browser --> notebookServer : место обработки всех WS запросов
+       notebookServer --> notebookService
+       notebookService --> notebook
+       notebook --> noteManager
+       noteManager--> paragraph
+       paragraph --> remoteInterpreter
+       remoteInterpreter --> remoteInterpreterService
+}
+
+
+@enduml
