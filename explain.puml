@@ -1,0 +1,71 @@
+@startuml
+'https://plantuml.com/object-diagram
+'
+'   object Thread_main{
+ '   trace:
+ '        *jetty.
+ '        *ZeppelinServer
+ '   }
+'
+'   object Thread_jettyThreads...{
+ '   }
+'
+'   object Thread6{
+ '    trace:
+ '        *java.net.ServerSocket
+ '        *org.apache.thrift
+ '        *RemoteInterpreterEventServer
+ '
+ '   }
+'
+'   object ServerConnector{
+ '       trace:
+ '           *sun.nio.ServerSocketChannel
+ '           *jetty.server.*
+ '
+ '   }
+'
+'   object Thread_RMI_threads...
+'
+
+
+
+        package something_PID{
+            object what_is_it_PID {
+                отдельный процесс JVM
+            }
+
+                package something{
+                    object what_is_it {
+                        часть кода
+                        (выполняется параллельно)
+                    }
+                }
+
+        }
+
+
+
+
+
+    class C
+    class D
+    C --> D : исполнение внтури потока
+
+    class A
+    class B
+
+    A -> B #red : взаимодействие разных потоков \n внутри одной JVM
+
+    class E
+    class F
+
+    E -> F #blue : взаимодействие разных процессов \n внутри разных JVM
+
+
+
+
+
+
+
+@enduml
