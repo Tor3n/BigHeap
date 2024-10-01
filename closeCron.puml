@@ -8,7 +8,10 @@ package остановка_кроновых_Jobов{
              запуск по расписанию
        }
        object notebookService{
+
             +runAllParagraphs()
+            выполняется при странном условии paragraphs==null
+            в противном случае обычное выполнение по одному параграфу
        }
        object notebookServer{
             +runAllParagraphs() WS событие при нажатии
@@ -55,7 +58,7 @@ package остановка_кроновых_Jobов{
                 remoteInterpreterProcess.stop()
        }
 
-       notebookServer --> notebookService
+       notebookServer --> notebookService : когда в ноутбуке нет параграфов???
        cronJob -->note : blocking : true, isolated : true
        notebookService -->note : blocking : true, isolated : false
        notebookRestAPI -->note : blocking : {}, isolated : {} \n srv/api/notebook/job/{noteID}
