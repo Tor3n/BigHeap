@@ -1,4 +1,4 @@
-package lambdas;
+package commonProblems_AKA_zadachki.lambdas;
 
 
 import java.util.ArrayList;
